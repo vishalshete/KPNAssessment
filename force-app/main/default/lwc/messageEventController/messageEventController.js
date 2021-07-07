@@ -2,7 +2,6 @@
  * Created by vishalshete on 06/07/2021.
  */
 
-// import {LightningElement, track, api, wire} from 'lwc';
 import MessagingService from '@salesforce/messageChannel/orderMessage__c';
 import {createMessageContext, releaseMessageContext, publish} from 'lightning/messageService';
 

@@ -28,8 +28,20 @@ public inherited sharing class OrderProductsController {
     }
     @AuraEnabled(Cacheable=true)
     public static List<OrderItem> getAvailableOrderItems(Id orderId){
-        orderRecordId = orderId;
-        return orderItems;
+        try {
+            orderRecordId = orderId;
+            return orderItems;
+        } catch (Exception ex){
+            throw ex;
+        }
+    }
+    @AuraEnabled(Cacheable=true)
+    public static Order getOrder(Id orderId){
+        try {
+            return [SELECT Id, Status FROM Order WHERE Id = :orderId WITH SECURITY_ENFORCED];
+        } catch (Exception ex){
+            throw ex;
+        }
     }
 
     @AuraEnabled
@@ -42,13 +54,12 @@ public inherited sharing class OrderProductsController {
                     OrderItem orderItem         = new OrderItem();
                     orderItem.OrderId           = orderId;
                     orderItem.Product2Id        = productId;
+                    System.debug(pricebookEntryMap);
                     orderItem.UnitPrice         = pricebookEntryMap.get(pricebookEntryId).UnitPrice;
                     orderItem.Quantity          = 1;
                     orderItem.PricebookEntryId  = pricebookEntryId;
                     insert orderItem;
-
                     orderItems.add(orderItem);
-
                 } else {
                     update updatedOrderItems;
                     orderItems = updatedOrderItems;
@@ -61,7 +72,22 @@ public inherited sharing class OrderProductsController {
         } catch (Exception ex){
             throw ex;
         }
-
+    }
+    @AuraEnabled
+    public static Order activateOrderItems(Id orderId){
+        try {
+            Order order = new Order();
+            if (Schema.SObjectType.OrderItem.isUpdateable()) {
+                order.Id = orderId;
+                order.Status = 'Activated';
+                update order;
+            } else {
+                throw new CustomException('You don\'t have access to create Order');
+            }
+            return order;
+        } catch (Exception ex){
+            throw ex;
+        }
     }
     private static List<OrderItem> checkExistingOrderItem(List<OrderItem> orderItems,Id productId){
         for(OrderItem orderItem:orderItems){

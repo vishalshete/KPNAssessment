@@ -7,6 +7,9 @@
     <lightning-card title="Order Items">
         <div class="slds-grid slds-wrap">
             <div class="slds-col slds-size_1-of-1">
+                <lightning-button variant="brand" disabled={isActivated} label="Activate" title="Activate Order" onclick={handleActivateClick} class="slds-m-left_x-small"></lightning-button>
+            </div>
+            <div class="slds-col slds-size_1-of-1">
                 <lightning-datatable
                         key-field="id"
                         columns={orderItemColumns}
