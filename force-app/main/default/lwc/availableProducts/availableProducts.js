@@ -75,6 +75,12 @@ export default class AvailableProducts extends LightningElement {
     @track order;
 
     /**
+     * Attribute to store Search String
+     */
+    @track searchString;
+
+
+    /**
      * Return true if order is Activated
      * @returns {boolean}
      */
@@ -189,7 +195,27 @@ export default class AvailableProducts extends LightningElement {
             if(productFound) existingProducts.push(product);
             else newProducts.push(product);
         })
-        return existingProducts.concat(newProducts);
+        return this.filterProducts(existingProducts).concat(this.filterProducts(newProducts));
+    }
+
+    /**
+     * Method to filter product based on Product Name
+     * @param records
+     * @returns {*}
+     */
+    filterProducts(records){
+        if(this.searchString && records.length>0){
+            return records.filter(record=> record.Name.toLowerCase().includes(this.searchString.toLowerCase()));
+        }
+        return records;
+    }
+
+    /**
+     * Method to handle search string change
+     * @param event
+     */
+    handleSearch(event){
+        this.searchString = event.detail.value
     }
 
     /**
@@ -246,7 +272,6 @@ export default class AvailableProducts extends LightningElement {
         }
     }
 
-
     /**
      * Method to dispatch event by messaging channel
      * @param source source of event
@@ -278,5 +303,6 @@ export default class AvailableProducts extends LightningElement {
         });
         this.dispatchEvent(event);
     }
+
 
 }

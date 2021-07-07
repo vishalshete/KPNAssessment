@@ -63,6 +63,7 @@ export default class OrderProducts extends LightningElement {
      * @returns {boolean}
      */
     get isActivated(){
+        if(!this.orderItems) return true;
         if(this.order) return this.order.Status === 'Activated' || this.orderItems.length<1;
     }
     /**

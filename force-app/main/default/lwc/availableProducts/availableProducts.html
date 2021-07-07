@@ -5,13 +5,15 @@
 <!-- Available Products -->
 <template>
     <lightning-card title="Available Product">
-        <div class="slds-grid slds-wrap">
-            <div class="slds-col slds-size_1-of-1">
+        <div class="slds-grid slds-grid_align-spread slds-wrap">
+            <div class="slds-col slds-size_1-of-3">
                 <lightning-combobox name="pricebook" label="Select Pricebook" value={pricebookId} options={pricebookList} onchange={handlePricebookChange}>
                 </lightning-combobox>
             </div>
-            <div class="slds-col slds-size_1-of-1">
-<!--                <div style="height: 300px;">-->
+            <div class="slds-col slds-size_1-of-3">
+                <lightning-input name="searchBox" placeholder="Search Product ..." onchange={handleSearch} value={searchString}></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-1"  style="height: 150px;">
                     <lightning-datatable
                             key-field="id"
                             columns={productColumns}
@@ -19,7 +21,6 @@
                             hide-checkbox-column
                             onrowaction={handleRowAction}>
                     </lightning-datatable>
-<!--                </div>-->
             </div>
         </div>
     </lightning-card>
