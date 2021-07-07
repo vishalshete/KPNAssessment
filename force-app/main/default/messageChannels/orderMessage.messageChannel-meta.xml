@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>orderMessage</masterLabel>
+    <description>This channels is to communicate between component for Order</description>
+    <isExposed>true</isExposed>
+    <lightningMessageFields>
+        <description>The message that is sent to process</description>
+        <fieldName>message</fieldName>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <description>The source of the message</description>
+        <fieldName>source</fieldName>
+    </lightningMessageFields>
+</LightningMessageChannel>

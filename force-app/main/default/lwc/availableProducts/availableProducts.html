@@ -1,0 +1,26 @@
+<!--
+ - Created by vishalshete on 06/07/2021.
+ -->
+
+<!-- Available Products -->
+<template>
+    <lightning-card title="Available Product">
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_1-of-1">
+                <lightning-combobox name="pricebook" label="Select Pricebook" value={pricebookId} options={pricebookList} onchange={handlePricebookChange}>
+                </lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_1-of-1">
+<!--                <div style="height: 300px;">-->
+                    <lightning-datatable
+                            key-field="id"
+                            columns={productColumns}
+                            data={products}
+                            hide-checkbox-column
+                            onrowaction={handleRowAction}>
+                    </lightning-datatable>
+<!--                </div>-->
+            </div>
+        </div>
+    </lightning-card>
+</template>

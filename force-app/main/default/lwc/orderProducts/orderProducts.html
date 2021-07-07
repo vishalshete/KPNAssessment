@@ -1,0 +1,20 @@
+<!--
+ - Created by vishalshete on 06/07/2021.
+ -->
+
+<!-- Order Products -->
+<template>
+    <lightning-card title="Order Items">
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_1-of-1">
+                <lightning-datatable
+                        key-field="id"
+                        columns={orderItemColumns}
+                        data={orderItems}
+                        hide-checkbox-column>
+                </lightning-datatable>
+            </div>
+        </div>
+
+    </lightning-card>
+</template>
