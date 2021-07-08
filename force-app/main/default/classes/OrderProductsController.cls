@@ -62,7 +62,7 @@ public inherited sharing class OrderProductsController {
     @AuraEnabled(Cacheable=true)
     public static Order getOrder(Id orderId){
         try {
-            Order order = [SELECT Id, Status,Account.AccountNumber,OrderNumber,Type,Pricebook2Id FROM Order WHERE Id = :orderId WITH SECURITY_ENFORCED];
+            Order order = [SELECT Id, Status,Account.AccountNumber,OrderNumber,Type,Pricebook2Id,(SELECT Id,Product2.Name,Quantity,UnitPrice,TotalPrice,Product2.ProductCode FROM OrderItems) FROM Order WHERE Id = :orderId WITH SECURITY_ENFORCED];
             return order;
         } catch (Exception ex){
             throw new CustomException(ex.getMessage());
