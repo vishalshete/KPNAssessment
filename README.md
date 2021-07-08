@@ -12,7 +12,12 @@
 3) These components communicate with MessageChannel, the messages use source and recordId to filter and execute the functionality accordingly.
 4) Both components use apex controllers to query and perform DML operations.
 5) The components can be placed anywhere in Order detail page. 
-6) User can select Pricebook on available 
+6) User can select Pricebook on available.
+7) For now soring is not implemented.
+
+Login credentials 
+Username : test-ft9ncgsrhtmy@example.com
+password : |Hvx2s6T4ROW%
 
 
 
