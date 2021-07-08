@@ -62,7 +62,7 @@ public inherited sharing class OrderProductsController {
     @AuraEnabled(Cacheable=true)
     public static Order getOrder(Id orderId){
         try {
-            Order order = [SELECT Id, Status,Account.AccountNumber,OrderNumber,Type,(SELECT Id,Product2.Name,Quantity,UnitPrice,TotalPrice,Product2.ProductCode FROM OrderItems) FROM Order WHERE Id = :orderId WITH SECURITY_ENFORCED];
+            Order order = [SELECT Id, Status,Account.AccountNumber,OrderNumber,Type,Pricebook2Id FROM Order WHERE Id = :orderId WITH SECURITY_ENFORCED];
             return order;
         } catch (Exception ex){
             throw ex;
@@ -84,6 +84,7 @@ public inherited sharing class OrderProductsController {
             if (Schema.SObjectType.OrderItem.isCreateable()) {
                 List<OrderItem> updatedOrderItems = checkExistingOrderItem(orderItems,productId);
                 if(updatedOrderItems==null) {
+                    setPricebookOnOrder(orderId,pricebookEntryId);
                     OrderItem orderItem         = new OrderItem();
                     orderItem.OrderId           = orderId;
                     orderItem.Product2Id        = productId;
@@ -101,8 +102,17 @@ public inherited sharing class OrderProductsController {
                 throw new CustomException(Label.Order_Item_Access_Error);
             }
         } catch (Exception ex){
-            throw ex;
+            throw new CustomException(ex.getMessage());
         }
+    }
+    private static Order setPricebookOnOrder(Id orderId,Id pricebookEntryId){
+        Order order = getOrder(orderId);
+        if(order.Pricebook2Id==null) {
+            PricebookEntry pricebookEntry = [SELECT Id,Pricebook2Id FROM PricebookEntry WHERE Id = :pricebookEntryId WITH SECURITY_ENFORCED];
+            order.Pricebook2Id = pricebookEntry.Pricebook2Id;
+            if(Schema.SObjectType.Order.isUpdateable()) update order;
+        }
+        return order;
     }
     /**
      * Method to Activate the Order record.

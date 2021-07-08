@@ -47,7 +47,7 @@ export default class AvailableProducts extends LightningElement {
         Loading_Label,
         OrderItem_Insert_Error
     }
-
+    @api flexipageRegionWidth;
     /**
      * Array to store List of Pricebooks
      * @type {[]}
@@ -237,12 +237,18 @@ export default class AvailableProducts extends LightningElement {
     _createGroup(){
         let existingProducts=[];
         let newProducts=[];
-        this.availableProducts.forEach(product=>{
-            let productFound = this.orderItems.find( orderItem=> orderItem.product2Id===product.Product2Id);
-            if(productFound) existingProducts.push(product);
-            else newProducts.push(product);
-        })
-        let result = this._filterProducts(existingProducts).concat(this._filterProducts(newProducts));
+        let result;
+        if(this.orderItems) {
+            this.availableProducts.forEach(product => {
+                let productFound = this.orderItems.find(orderItem => orderItem.product2Id === product.Product2Id);
+                if (productFound) existingProducts.push(product);
+                else newProducts.push(product);
+            })
+            result = this._filterProducts(existingProducts).concat(this._filterProducts(newProducts));
+            this.isLoading = false;
+            return result;
+        }
+        result = this._filterProducts(this.availableProducts);
         this.isLoading = false;
         return result;
     }
@@ -274,16 +280,6 @@ export default class AvailableProducts extends LightningElement {
         }
     }
 
-
-    /**
-     * method to execute when pricebook is changed in combobox
-     * @param event
-     */
-    handlePricebookChange(event){
-        this.pricebookId = undefined;
-        this.pricebookId = event.detail.value
-        refreshApex(this.wiredAvailableProducts);
-    }
     /**
      * Method to filter product based on Product Name
      * @param records

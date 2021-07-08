@@ -4,7 +4,7 @@
 
 <!-- Order Products -->
 <template>
-    <lightning-card title={labels.Order_Items_Label} >
+    <lightning-card title={labels.Order_Items_Label} class={flexipageRegionWidth} >
         <div class="slds-grid slds-wrap">
             <div class="slds-col slds-size_1-of-1">
                 <lightning-button variant="brand" disabled={isActivated} label={labels.Activate_Label} title={labels.Activate_Order_Label} onclick={handleActivateClick} class="slds-m-left_x-small"></lightning-button>

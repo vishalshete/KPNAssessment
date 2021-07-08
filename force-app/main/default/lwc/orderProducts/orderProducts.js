@@ -34,7 +34,7 @@ export default class OrderProducts extends LightningElement {
         Activate_Label,
         Activate_Order_Label
     }
-
+    @api flexipageRegionWidth;
     /**
      * Order record id
      */

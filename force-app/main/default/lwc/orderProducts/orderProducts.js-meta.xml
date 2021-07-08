@@ -12,8 +12,7 @@
             <objects>
                 <object>Order</object>
             </objects>
-            <property name="recordId" type="String" />
-            <property name="height" type="String" />
+            <property name="height" type="String" description="Height of the  component in number" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

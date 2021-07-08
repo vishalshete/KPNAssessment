@@ -4,10 +4,10 @@
 
 <!-- Available Products -->
 <template>
-    <lightning-card title={labels.Available_Product_Label}>
+    <lightning-card title={labels.Available_Product_Label} class={flexipageRegionWidth}>
         <div class="slds-grid slds-grid_align-spread slds-wrap">
             <div class="slds-col slds-size_1-of-2">
-                <lightning-combobox name="pricebook" label={labels.Select_Pricebook_Label} value={pricebookId} options={pricebookList} onchange={handlePricebookChange}>
+                <lightning-combobox name="pricebook" label={labels.Select_Pricebook_Label} value={pricebookId} options={pricebookList} disabled=true>
                 </lightning-combobox>
             </div>
             <div class="slds-col slds-size_1-of-3">

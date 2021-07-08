@@ -12,8 +12,8 @@
             <objects>
                 <object>Order</object>
             </objects>
-            <property name="defaultPricebook" type="String" />
-            <property name="height" type="String" />
+            <property name="defaultPricebook" type="String" description="Name of a default price book to be selected"/>
+            <property name="height" type="String" description="Height of the  component in number" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>
