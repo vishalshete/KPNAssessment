@@ -210,7 +210,7 @@ export default class AvailableProducts extends LightningElement {
         if (data) {
             this.pricebooks = data;
             let defaultPricebook = this.pricebooks.find(pricebook=>pricebook.Name===this.defaultPricebook)
-            this.pricebookId = defaultPricebook.Id
+            if(defaultPricebook)this.pricebookId = defaultPricebook.Id
         } else if (error) {
             this.handleError(error);
         }
