@@ -20,6 +20,8 @@ import {APPLICATION_SCOPE, MessageContext, subscribe} from "lightning/messageSer
 import Select_Pricebook_Label from  '@salesforce/label/c.Select_Pricebook_Label';
 import Search_Product_Label from  '@salesforce/label/c.Search_Product_Label';
 import Available_Product_Label from  '@salesforce/label/c.Available_Product_Label';
+import Loading_Label from  '@salesforce/label/c.Loading_Label';
+import OrderItem_Insert_Error from  '@salesforce/label/c.OrderItem_Insert_Error';
 
 
 const COLUMNS = [
@@ -41,7 +43,9 @@ export default class AvailableProducts extends LightningElement {
     labels = {
         Select_Pricebook_Label,
         Search_Product_Label,
-        Available_Product_Label
+        Available_Product_Label,
+        Loading_Label,
+        OrderItem_Insert_Error
     }
 
     /**
@@ -49,37 +53,45 @@ export default class AvailableProducts extends LightningElement {
      * @type {[]}
      */
     @track pricebooks = [];
+
     /**
      * Array to store list of available products
      * @type {[]}
      */
     @track availableProducts=[];
+
     /**
      * Selected Pricebook Id
      */
-    @track pricebookId;
+    pricebookId;
+
     /**
      * Attribute to store default pricebook
      * @type {string}
      */
     @api defaultPricebook = 'Standard Price Book';
+
     /**
      * record Id of the Order
      */
     @api recordId;
+
     /**
      * Attribute to prefrom refresh Apex for Order Item results
      */
     @track wiredOrderItemResults;
+
     /**
      * Attribute to store list of Order Items
      */
     @track orderItems;
+
     /**
      * Attribute to store Available Products datatable columns
      * @type {[{initialWidth: number, label: string, type: string, typeAttributes: {iconName: string, variant: string, title: string, alternativeText: string}}, {fieldName: string, label: string, type: string}, {fieldName: string, label: string, type: string}]}
      */
     productColumns = COLUMNS;
+
     /**
      * Stores Order Record
      */
@@ -90,6 +102,10 @@ export default class AvailableProducts extends LightningElement {
      */
     @track searchString;
 
+    /**
+     * Stores the status of loading data in component
+     */
+    @track isLoading = false;
 
     /**
      * Return true if order is Activated
@@ -108,11 +124,16 @@ export default class AvailableProducts extends LightningElement {
      * Attribute to refreshApex when Pricebook is changed
      */
     @track wiredAvailableProducts;
+    /**
+     * it stores the height of datatable
+     */
+    @api height = 150;
 
     /**
      * call to check feature access when loaded
      */
     connectedCallback() {
+        this.isLoading = true;
         this.instantiateMessageChannel();
     }
 
@@ -123,6 +144,13 @@ export default class AvailableProducts extends LightningElement {
     messageContext;
 
     /**
+     * return the  style property of datatable
+     * @returns {string}
+     */
+    get styleAttr(){
+        return 'height: '+this.height+'px;';
+    }
+    /**
      * Method to show formatted Pricebooks and select a default pricebook
      * @returns {*[]}
      */
@@ -130,7 +158,6 @@ export default class AvailableProducts extends LightningElement {
         let result = [];
         this.pricebooks.forEach(pricebook=>{
             result.push({label:pricebook.Name,value:pricebook.Id});
-            if(pricebook.Name===this.defaultPricebook) this.pricebookId = pricebook.Id;
         });
         return result;
     }
@@ -140,7 +167,9 @@ export default class AvailableProducts extends LightningElement {
      * @returns {*[]}
      */
     get products(){
-        return this.createGroup();
+        this.isLoading = true;
+        return this._createGroup();
+
     }
 
     /**
@@ -180,6 +209,8 @@ export default class AvailableProducts extends LightningElement {
     wiredPricebookResponse({ data, error }) {
         if (data) {
             this.pricebooks = data;
+            let defaultPricebook = this.pricebooks.find(pricebook=>pricebook.Name===this.defaultPricebook)
+            this.pricebookId = defaultPricebook.Id
         } else if (error) {
             this.handleError(error);
         }
@@ -187,45 +218,33 @@ export default class AvailableProducts extends LightningElement {
 
     /**
      * Method to get available products from Org
-     * @param data
-     * @param error
      * @param result
      */
     @wire(getAvailableProducts,{pricebookId:'$pricebookId'})
-    wiredProductResponse({ data, error }) {
-        if (data) {
-            this.availableProducts = data;
-        } else if (error) {
-            this.handleError(error);
+    wiredProductResponse(result) {
+        this.wiredAvailableProducts = result;
+        if (result.data) {
+            this.availableProducts = result.data;
+        } else if (result.error) {
+            this.handleError(result.error);
         }
     }
-
-    /**
-     * Method to get available products from Org
-     * @param result
-     */
-    async getAvailableProducts(){
-        try {
-            this.availableProducts = await getAvailableProducts({pricebookId: this.pricebookId})
-        } catch (e){
-            this.handleError(e.body.message);
-        }
-    }
-
 
     /**
      * Method to create group on datatable based on selected/unselected products
      * @returns {*[]}
      */
-    createGroup(){
+    _createGroup(){
         let existingProducts=[];
         let newProducts=[];
         this.availableProducts.forEach(product=>{
-            let productFound = this.orderItems.find( orderItem=> orderItem.Product2Id===product.Product2Id);
+            let productFound = this.orderItems.find( orderItem=> orderItem.product2Id===product.Product2Id);
             if(productFound) existingProducts.push(product);
             else newProducts.push(product);
         })
-        return this.filterProducts(existingProducts).concat(this.filterProducts(newProducts));
+        let result = this._filterProducts(existingProducts).concat(this._filterProducts(newProducts));
+        this.isLoading = false;
+        return result;
     }
 
     /**
@@ -250,6 +269,8 @@ export default class AvailableProducts extends LightningElement {
                 product2Id: selectedProduct.Product2Id
             };
             this.dispatchMessage('availableProduct', payload);
+        } else{
+            this.showToast('Info',this.labels.OrderItem_Insert_Error,'info')
         }
     }
 
@@ -259,29 +280,19 @@ export default class AvailableProducts extends LightningElement {
      * @param event
      */
     handlePricebookChange(event){
+        this.pricebookId = undefined;
         this.pricebookId = event.detail.value
-        this.getAvailableProducts();
+        refreshApex(this.wiredAvailableProducts);
     }
-    // /**
-    //  * Method to filter product based on Product Name
-    //  * @param records
-    //  * @returns {*}
-    //  */
-    // filterProducts(records){
-    //     if(this.pricebookId && records.length>0){
-    //         return records.filter(record=> record.Pricebook2Id===this.pricebookId);
-    //     }
-    //     return records;
-    // }
-
     /**
      * Method to filter product based on Product Name
      * @param records
      * @returns {*}
      */
-    filterProducts(records){
+    _filterProducts(records){
         if(this.searchString && records.length>0){
             return records.filter(record=> record.Name.toLowerCase().includes(this.searchString.toLowerCase()));
+
         }
         return records;
     }
@@ -298,6 +309,7 @@ export default class AvailableProducts extends LightningElement {
                 this.handleMessage(message);
             },
             {scope: APPLICATION_SCOPE});
+        this.isLoading = false;
     }
 
     /**
@@ -305,12 +317,17 @@ export default class AvailableProducts extends LightningElement {
      * @param message
      */
     handleMessage(message) {
+
         let payload = message.message;
         if(message.source === 'orderActivated' && payload.order.Id === this.recordId) {
+            this.isLoading = true;
             this.order = payload.order;
-        }//orderItemInserted
+            this.isLoading = false;
+        }
         else if(message.source === 'orderItemInserted' && payload.orderId === this.recordId) {
+            this.isLoading = true;
             refreshApex(this.wiredOrderItemResults)
+            this.isLoading = false;
         }
     }
 

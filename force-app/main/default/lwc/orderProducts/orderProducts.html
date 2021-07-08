@@ -9,7 +9,10 @@
             <div class="slds-col slds-size_1-of-1">
                 <lightning-button variant="brand" disabled={isActivated} label={labels.Activate_Label} title={labels.Activate_Order_Label} onclick={handleActivateClick} class="slds-m-left_x-small"></lightning-button>
             </div>
-            <div class="slds-col slds-size_1-of-1">
+            <div if:true={isLoading}>
+                <lightning-spinner alternative-text={labels.Loading_Label} size="medium"></lightning-spinner>
+            </div>
+            <div if:false={isLoading} class="slds-col slds-size_1-of-1" style={styleAttr}>
                 <lightning-datatable
                         key-field="id"
                         columns={orderItemColumns}

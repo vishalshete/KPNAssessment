@@ -13,6 +13,7 @@
                 <object>Order</object>
             </objects>
             <property name="defaultPricebook" type="String" />
+            <property name="height" type="String" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

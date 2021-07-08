@@ -21,10 +21,10 @@ import Activate_Label from '@salesforce/label/c.Activate_Label';
 import Activate_Order_Label from '@salesforce/label/c.Activate_Order_Label';
 
 const COLUMNS = [
-    {label: 'Name',fieldName: 'Product2.Name',type: 'text'},
-    {label: 'Unit Price',fieldName: 'UnitPrice',type: 'currency'},
-    {label: 'Quantity',fieldName: 'Quantity',type: 'number'},
-    {label: 'Total Price',fieldName: 'UnitPrice',type: 'currency'},
+    {label: 'Name',fieldName: 'orderItemName',type: 'text'},
+    {label: 'Unit Price',fieldName: 'unitPrice',type: 'currency'},
+    {label: 'Quantity',fieldName: 'quantity',type: 'number'},
+    {label: 'Total Price',fieldName: 'totalPrice',type: 'currency'},
 ];
 
 export default class OrderProducts extends LightningElement {
@@ -46,7 +46,7 @@ export default class OrderProducts extends LightningElement {
     /**
      * Attribute to Stores OrderItems
      */
-    @track orderItems;
+    @track orderItems = [];
 
     /**
      * Attribute to store OrderItem datatable columns
@@ -66,6 +66,23 @@ export default class OrderProducts extends LightningElement {
      * @type {null} stores subscription data when message is received on Message channel
      */
     subscription = null;
+
+    /**
+     * it stores the height of datatable
+     */
+    @api height = 150;
+    /**
+     * Stores the status of loading data in component
+     */
+    @track isLoading = false;
+
+    /**
+     * return the  style property of datatable
+     * @returns {string}
+     */
+    get styleAttr(){
+        return 'height: '+this.height+'px;';
+    }
 
     /**
      * Return true if order is Activated
@@ -96,12 +113,24 @@ export default class OrderProducts extends LightningElement {
     wiredOrder(result) {
         if (result.data) {
             this.order = result.data;
-            this.orderItems = this.order.OrderItems;
         } else if (result.error) {
             this.handleError(result.error)
         }
     }
 
+    /**
+     * Method to get list of available orderItems
+     * @param result
+     */
+    @wire(getAvailableOrderItems,{orderId:'$recordId'})
+    wiredOrderItems(result) {
+        this.wiredOrderItemResults = result;
+        if (result.data) {
+            this.orderItems = result.data;
+        } else if (result.error) {
+            this.handleError(result.error)
+        }
+    }
 
     /**
      * register self on Message channel message subscription
@@ -162,8 +191,10 @@ export default class OrderProducts extends LightningElement {
      */
     async handleActivateClick(){
         try{
+            this.isLoading = true;
             this.order = await activateOrderItems({orderId:this.recordId})
             let payload = {order: this.order};
+            this.isLoading = false;
             this.dispatchMessage('orderActivated',payload);
         } catch (e){
             this.handleError(e.body.message);

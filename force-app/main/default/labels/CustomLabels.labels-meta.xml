@@ -49,6 +49,14 @@
         <value>Activate Order</value>
     </labels>
     <labels>
+        <fullName>OrderItem_Insert_Error</fullName>
+        <categories>KPN Assessment</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>OrderItem insert  warning message</shortDescription>
+        <value>Once Order is activated. No more Order Item can be added</value>
+    </labels>
+    <labels>
         <fullName>Order_Item_Access_Error</fullName>
         <categories>KPN Assessment</categories>
         <language>en_US</language>
@@ -71,5 +79,13 @@
         <protected>true</protected>
         <shortDescription>Error message for poosting Order to Request catcher</shortDescription>
         <value>Error while posting Order to Request catcher</value>
+    </labels>
+    <labels>
+        <fullName>Loading_Label</fullName>
+        <categories>KPN Assessment</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for Loading alternative text</shortDescription>
+        <value>Loading</value>
     </labels>
 </CustomLabels>

@@ -19,6 +19,7 @@ public inherited sharing class OrderProductsController {
     public static List<OrderItem> orderItems{
         get{
             if(orderItems==null){
+                orderItems = new List<OrderItem>();
                 orderItems = [SELECT Id,Product2.Name,Quantity,UnitPrice,TotalPrice FROM OrderItem WHERE OrderId = :orderRecordId WITH SECURITY_ENFORCED ];
             }
             return orderItems;
@@ -45,10 +46,10 @@ public inherited sharing class OrderProductsController {
      * @return List  of Order Items
      */
     @AuraEnabled(Cacheable=true)
-    public static List<OrderItem> getAvailableOrderItems(Id orderId){
+    public static List<OrderItemDTO> getAvailableOrderItems(Id orderId){
         try {
             orderRecordId = orderId;
-            return orderItems;
+            return convertOrderItemDTO(orderItems);
         } catch (Exception ex){
             throw ex;
         }
@@ -77,7 +78,7 @@ public inherited sharing class OrderProductsController {
      * @return Updated  List of Order Items
      */
     @AuraEnabled
-    public static List<OrderItem> addOrderItem(Id orderId,Id productId,Id pricebookEntryId){
+    public static List<OrderItemDTO> addOrderItem(Id orderId,Id productId,Id pricebookEntryId){
         try {
             orderRecordId = orderId;
             if (Schema.SObjectType.OrderItem.isCreateable()) {
@@ -95,7 +96,7 @@ public inherited sharing class OrderProductsController {
                     update updatedOrderItems;
                     orderItems = updatedOrderItems;
                 }
-                return orderItems;
+                return convertOrderItemDTO(orderItems);
             } else {
                 throw new CustomException(Label.Order_Item_Access_Error);
             }
@@ -152,12 +153,28 @@ public inherited sharing class OrderProductsController {
      * @return List of OrderItems
      */
     private static List<OrderItem> checkExistingOrderItem(List<OrderItem> orderItems,Id productId){
-        for(OrderItem orderItem:orderItems){
-            if(orderItem.Product2Id==productId){
-                orderItem.Quantity +=1;
-                return orderItems;
+        if(orderItems!=null) {
+            for (OrderItem orderItem : orderItems) {
+                if (orderItem.Product2Id == productId) {
+                    orderItem.Quantity += 1;
+                    return orderItems;
+                }
             }
         }
         return null;
+    }
+
+    /**
+     * Method to convert OrderItems to  OrderItemDTO
+     * @param orderItems List of Order Items
+     *
+     * @return List of OrderItemDTO
+     */
+    private static List<OrderItemDTO> convertOrderItemDTO(List<OrderItem> orderItems){
+        List<OrderItemDTO> orderItemDTOS = new List<OrderItemDTO>();
+        for(OrderItem orderItem:orderItems){
+            orderItemDTOS.add(new OrderItemDTO(orderItem.Product2Id,orderItem.Product2.Name,orderItem.UnitPrice,orderItem.Quantity,orderItem.TotalPrice));
+        }
+        return  orderItemDTOS;
     }
 }
