@@ -12,7 +12,7 @@ public with sharing class AvailableProductsController {
      */
     @AuraEnabled(Cacheable=true)
     public static List<PricebookEntry> getAvailableProducts(Id pricebookId){
-        return [SELECT Name,Id,UnitPrice,Product2Id FROM PricebookEntry WHERE IsActive = TRUE AND Pricebook2Id =:pricebookId WITH SECURITY_ENFORCED ];
+        return [SELECT Name,Id,UnitPrice,Product2Id,Pricebook2Id FROM PricebookEntry WHERE IsActive = TRUE AND Pricebook2Id =:pricebookId WITH SECURITY_ENFORCED ];
     }
 
     /**

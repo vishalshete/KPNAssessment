@@ -1,3 +1,22 @@
+# Pre-requisite
+1) The list of the objects required are Order, Order Item, Product, Pricebook, PricebookEntry.
+2) Org should have Active Products.
+3) Org should have at least one PriceBook.
+4) Org should have Pricebook Entries for the Products.
+5) If there are additional require fields to create an Order Item, then apex needs to be updated to match those fields.
+6) The list of the objects required are Order, Order Item, Product, Pricebook, PricebookEntry.
+
+# Solution
+1) We have two components on the Order detail page "Available Products" and "Order Products".
+2) The components use Order Record Id to load data and format them accordingly.
+3) These components communicate with MessageChannel, the messages use source and recordId to filter and execute the functionality accordingly.
+4) Both components use apex controllers to query and perform DML operations.
+5) The components can be placed anywhere in Order detail page. 
+6) User can select Pricebook on available 
+
+
+
+
 # Salesforce DX Project: Next Steps
 
 Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.

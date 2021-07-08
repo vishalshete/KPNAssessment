@@ -16,6 +16,11 @@ import getAvailableProducts from '@salesforce/apex/AvailableProductsController.g
 import getAvailableOrderItems from '@salesforce/apex/OrderProductsController.getAvailableOrderItems';
 import {APPLICATION_SCOPE, MessageContext, subscribe} from "lightning/messageService";
 
+//import label
+import Select_Pricebook_Label from  '@salesforce/label/c.Select_Pricebook_Label';
+import Search_Product_Label from  '@salesforce/label/c.Search_Product_Label';
+import Available_Product_Label from  '@salesforce/label/c.Available_Product_Label';
+
 
 const COLUMNS = [
     {label: '',
@@ -32,6 +37,12 @@ const COLUMNS = [
     {label: 'List Price',fieldName: 'UnitPrice',type: 'currency'}
 ];
 export default class AvailableProducts extends LightningElement {
+
+    labels = {
+        Select_Pricebook_Label,
+        Search_Product_Label,
+        Available_Product_Label
+    }
 
     /**
      * Array to store List of Pricebooks
@@ -93,6 +104,11 @@ export default class AvailableProducts extends LightningElement {
      * @type {null} stores subscription data when message is received on Message channel
      */
     subscription = null;
+    /**
+     * Attribute to refreshApex when Pricebook is changed
+     */
+    @track wiredAvailableProducts;
+
     /**
      * call to check feature access when loaded
      */
@@ -173,6 +189,7 @@ export default class AvailableProducts extends LightningElement {
      * Method to get available products from Org
      * @param data
      * @param error
+     * @param result
      */
     @wire(getAvailableProducts,{pricebookId:'$pricebookId'})
     wiredProductResponse({ data, error }) {
@@ -182,6 +199,19 @@ export default class AvailableProducts extends LightningElement {
             this.handleError(error);
         }
     }
+
+    /**
+     * Method to get available products from Org
+     * @param result
+     */
+    async getAvailableProducts(){
+        try {
+            this.availableProducts = await getAvailableProducts({pricebookId: this.pricebookId})
+        } catch (e){
+            this.handleError(e.body.message);
+        }
+    }
+
 
     /**
      * Method to create group on datatable based on selected/unselected products
@@ -196,18 +226,6 @@ export default class AvailableProducts extends LightningElement {
             else newProducts.push(product);
         })
         return this.filterProducts(existingProducts).concat(this.filterProducts(newProducts));
-    }
-
-    /**
-     * Method to filter product based on Product Name
-     * @param records
-     * @returns {*}
-     */
-    filterProducts(records){
-        if(this.searchString && records.length>0){
-            return records.filter(record=> record.Name.toLowerCase().includes(this.searchString.toLowerCase()));
-        }
-        return records;
     }
 
     /**
@@ -242,6 +260,30 @@ export default class AvailableProducts extends LightningElement {
      */
     handlePricebookChange(event){
         this.pricebookId = event.detail.value
+        this.getAvailableProducts();
+    }
+    // /**
+    //  * Method to filter product based on Product Name
+    //  * @param records
+    //  * @returns {*}
+    //  */
+    // filterProducts(records){
+    //     if(this.pricebookId && records.length>0){
+    //         return records.filter(record=> record.Pricebook2Id===this.pricebookId);
+    //     }
+    //     return records;
+    // }
+
+    /**
+     * Method to filter product based on Product Name
+     * @param records
+     * @returns {*}
+     */
+    filterProducts(records){
+        if(this.searchString && records.length>0){
+            return records.filter(record=> record.Name.toLowerCase().includes(this.searchString.toLowerCase()));
+        }
+        return records;
     }
 
     /**

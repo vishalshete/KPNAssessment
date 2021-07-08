@@ -66,14 +66,35 @@ public with sharing class OrderProductsControllerTest {
     }
 
     @IsTest
-    private static void testActivateOrderItems(){
+    private static void testActivateOrderItemsSuccess(){
         //given
         Order order = [SELECT Id FROM Order LIMIT 1];
         Test.startTest();
+        PostOrderHttpMock.successResponse = true;
+        Test.setMock(HttpCalloutMock.class, new PostOrderHttpMock());
+
         Order order2 = OrderProductsController.activateOrderItems(order.Id);
         Test.stopTest();
         //expected Order will be Activated
         System.assertEquals('Activated',order2.Status,'Order should be Activated');
+
+    }
+
+    @IsTest
+    private static void testActivateOrderItemsError(){
+        //given
+        Order order = [SELECT Id FROM Order LIMIT 1];
+        try {
+            Test.startTest();
+            PostOrderHttpMock.successResponse = false;
+            Test.setMock(HttpCalloutMock.class, new PostOrderHttpMock());
+            Test.stopTest();
+        } catch(CustomException ex){
+            Order order2 = OrderProductsController.activateOrderItems(order.Id);
+            System.assertEquals(Label.Order_Integration_Error,ex.getMessage(),'Exception message should match');
+            System.assertNotEquals('Activated',order2.Status,'Order should not Activated');
+
+        }
 
     }
 }

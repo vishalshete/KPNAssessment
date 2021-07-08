@@ -4,9 +4,18 @@
 
 public inherited sharing class OrderProductsController {
 
+    /**
+     * Stores the Id of the Order Record
+     */
+    private static Id orderRecordId;
 
-    public static Id orderRecordId;
-
+    /**
+     * Stores the Activated Status of the Order
+     */
+    private static final String ORDER_ACTIVATED_STATUS = 'Activated';
+    /**
+     * Getter to get a list of Order Items
+     */
     public static List<OrderItem> orderItems{
         get{
             if(orderItems==null){
@@ -17,6 +26,9 @@ public inherited sharing class OrderProductsController {
         set{}
     }
 
+    /**
+     * Getter to get a list of PricebookEntries
+     */
     public static Map<Id,PricebookEntry> pricebookEntryMap{
         get{
             if(pricebookEntryMap==null){
@@ -26,6 +38,12 @@ public inherited sharing class OrderProductsController {
         }
         set;
     }
+    /**
+     * Method to get Order Items for a given Order Record
+     * @param orderId Id of the Order Record
+     *
+     * @return List  of Order Items
+     */
     @AuraEnabled(Cacheable=true)
     public static List<OrderItem> getAvailableOrderItems(Id orderId){
         try {
@@ -35,15 +53,29 @@ public inherited sharing class OrderProductsController {
             throw ex;
         }
     }
+    /**
+     * Method to get Order Record based on Order recoord Id
+     * @param orderId Id of the Order Record
+     * @return Order Record
+     */
     @AuraEnabled(Cacheable=true)
     public static Order getOrder(Id orderId){
         try {
-            return [SELECT Id, Status FROM Order WHERE Id = :orderId WITH SECURITY_ENFORCED];
+            Order order = [SELECT Id, Status,Account.AccountNumber,OrderNumber,Type,(SELECT Id,Product2.Name,Quantity,UnitPrice,TotalPrice,Product2.ProductCode FROM OrderItems) FROM Order WHERE Id = :orderId WITH SECURITY_ENFORCED];
+            return order;
         } catch (Exception ex){
             throw ex;
         }
     }
 
+    /**
+     * Method add Order Item based  on product
+     * @param orderId Id of the Order Record
+     * @param productId Id of the Product Record
+     * @param pricebookEntryId  Id of the Pricebook Entry Record
+     *
+     * @return Updated  List of Order Items
+     */
     @AuraEnabled
     public static List<OrderItem> addOrderItem(Id orderId,Id productId,Id pricebookEntryId){
         try {
@@ -54,7 +86,6 @@ public inherited sharing class OrderProductsController {
                     OrderItem orderItem         = new OrderItem();
                     orderItem.OrderId           = orderId;
                     orderItem.Product2Id        = productId;
-                    System.debug(pricebookEntryMap);
                     orderItem.UnitPrice         = pricebookEntryMap.get(pricebookEntryId).UnitPrice;
                     orderItem.Quantity          = 1;
                     orderItem.PricebookEntryId  = pricebookEntryId;
@@ -65,30 +96,61 @@ public inherited sharing class OrderProductsController {
                     orderItems = updatedOrderItems;
                 }
                 return orderItems;
-
             } else {
-                throw new CustomException('You don\'t have access to create Order Item');
+                throw new CustomException(Label.Order_Item_Access_Error);
             }
         } catch (Exception ex){
             throw ex;
         }
     }
+    /**
+     * Method to Activate the Order record.
+     * @param orderId Id of the Order Record
+     *
+     * @return Updated Order Record
+     */
     @AuraEnabled
     public static Order activateOrderItems(Id orderId){
         try {
             Order order = new Order();
             if (Schema.SObjectType.OrderItem.isUpdateable()) {
-                order.Id = orderId;
-                order.Status = 'Activated';
-                update order;
+                if(sendOrder(orderId)) {
+                    order.Id = orderId;
+                    order.Status = ORDER_ACTIVATED_STATUS;
+                    update order;
+                }
             } else {
-                throw new CustomException('You don\'t have access to create Order');
+                throw new CustomException(Label.Order_Update_Error);
             }
             return order;
         } catch (Exception ex){
             throw ex;
         }
     }
+
+
+    /**
+     * Method to send Order to request catcher
+     * @param orderId
+     */
+    private static Boolean sendOrder(Id orderId){
+        Order order = getOrder(orderId);
+        List<OrderDTO.orderProducts> orderProducts = new List<OrderDTO.orderProducts>();
+        for(OrderItem orderItem : order.OrderItems){
+            orderProducts.add(new OrderDTO.orderProducts(orderItem.Product2.Name,orderItem.Product2.ProductCode,orderItem.UnitPrice,orderItem.Quantity));
+        }
+
+        List<OrderDTO> orderDTOS  = new List<OrderDTO>();
+        orderDTOS.add(new OrderDTO(order.Account.AccountNumber,order.OrderNumber,order.Type,order.Status,orderProducts));
+        return PostOrders.postOrder(JSON.serialize(orderDTOS));
+    }
+    /**
+     * Method  to check if  product is already exist in List of Order Items
+     * @param orderItems List of OrderItems
+     * @param productId record Id of Products
+     *
+     * @return List of OrderItems
+     */
     private static List<OrderItem> checkExistingOrderItem(List<OrderItem> orderItems,Id productId){
         for(OrderItem orderItem:orderItems){
             if(orderItem.Product2Id==productId){

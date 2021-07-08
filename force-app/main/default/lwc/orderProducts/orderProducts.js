@@ -15,7 +15,10 @@ import getOrder from '@salesforce/apex/OrderProductsController.getOrder';
 import addOrderItem from '@salesforce/apex/OrderProductsController.addOrderItem';
 import activateOrderItems from '@salesforce/apex/OrderProductsController.activateOrderItems';
 
-
+//import labels
+import Order_Items_Label from '@salesforce/label/c.Order_Items_Label';
+import Activate_Label from '@salesforce/label/c.Activate_Label';
+import Activate_Order_Label from '@salesforce/label/c.Activate_Order_Label';
 
 const COLUMNS = [
     {label: 'Name',fieldName: 'Product2.Name',type: 'text'},
@@ -25,6 +28,12 @@ const COLUMNS = [
 ];
 
 export default class OrderProducts extends LightningElement {
+
+    labels = {
+        Order_Items_Label,
+        Activate_Label,
+        Activate_Order_Label
+    }
 
     /**
      * Order record id
@@ -80,20 +89,6 @@ export default class OrderProducts extends LightningElement {
     messageContext;
 
     /**
-     * Method to get list of available orderItems
-     * @param result
-     */
-    @wire(getAvailableOrderItems,{orderId:'$recordId'})
-    wiredOrderItems(result) {
-        this.wiredOrderItemResults = result;
-        if (result.data) {
-            this.orderItems = result.data;
-        } else if (result.error) {
-            this.handleError(result.error)
-        }
-    }
-
-    /**
      * Method to get order Record details
      * @param result
      */
@@ -101,6 +96,7 @@ export default class OrderProducts extends LightningElement {
     wiredOrder(result) {
         if (result.data) {
             this.order = result.data;
+            this.orderItems = this.order.OrderItems;
         } else if (result.error) {
             this.handleError(result.error)
         }
@@ -128,8 +124,8 @@ export default class OrderProducts extends LightningElement {
     handleMessage(message) {
         let payload = message.message;
         if(message.source === 'availableProduct' && payload.orderId === this.recordId) {
-            this.newPricebookEntryId        = payload.pricebookEntryId;
-            this.newProductId              = payload.product2Id;
+            this.newPricebookEntryId  = payload.pricebookEntryId;
+            this.newProductId         = payload.product2Id;
             this.addOrderItem();
         }
     }

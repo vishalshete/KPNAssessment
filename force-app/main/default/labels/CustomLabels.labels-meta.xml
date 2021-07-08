@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Select_Pricebook_Label</fullName>
+        <categories>KPN Assessment</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Select Pricebook Label</shortDescription>
+        <value>Select Pricebook</value>
+    </labels>
+    <labels>
+        <fullName>Search_Product_Label</fullName>
+        <categories>KPN Assessment</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Search Product placeholder</shortDescription>
+        <value>Search Product ...</value>
+    </labels>
+    <labels>
+        <fullName>Available_Product_Label</fullName>
+        <categories>KPN Assessment</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title for Available Product component</shortDescription>
+        <value>Available Product</value>
+    </labels>
+    <labels>
+        <fullName>Order_Items_Label</fullName>
+        <categories>KPN Assessment</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title for Order Items component</shortDescription>
+        <value>Order Items</value>
+    </labels>
+    <labels>
+        <fullName>Activate_Label</fullName>
+        <categories>KPN Assessment</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for Activate Button</shortDescription>
+        <value>Activate</value>
+    </labels>
+    <labels>
+        <fullName>Activate_Order_Label</fullName>
+        <categories>KPN Assessment</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title for for Activate Button</shortDescription>
+        <value>Activate Order</value>
+    </labels>
+    <labels>
+        <fullName>Order_Item_Access_Error</fullName>
+        <categories>KPN Assessment</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error message for inaccessible Order Item Object</shortDescription>
+        <value>You don't have access to create Order Item</value>
+    </labels>
+    <labels>
+        <fullName>Order_Update_Error</fullName>
+        <categories>KPN Assessment</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error message for inaccessible Order Object</shortDescription>
+        <value>You don't have access to update Order</value>
+    </labels>
+    <labels>
+        <fullName>Order_Integration_Error</fullName>
+        <categories>KPN Assessment</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error message for poosting Order to Request catcher</shortDescription>
+        <value>Error while posting Order to Request catcher</value>
+    </labels>
+</CustomLabels>
