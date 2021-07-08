@@ -16,10 +16,10 @@ public with sharing class OrderProductsControllerTest {
         //given
         Order order = [SELECT Id FROM Order LIMIT 1];
         Test.startTest();
-            List<OrderItem> orderItems = OrderProductsController.getAvailableOrderItems(order.Id);
+            List<OrderItemDTO> orderItemDTOS = OrderProductsController.getAvailableOrderItems(order.Id);
         Test.stopTest();
         //expected
-        System.assertEquals(1,orderItems.size(),'OrderItem size should be 1');
+        System.assertEquals(1,orderItemDTOS.size(),'OrderItem size should be 1');
     }
     @IsTest
     private static void testGetOrder(){
@@ -41,11 +41,11 @@ public with sharing class OrderProductsControllerTest {
 
         //when Product already added to Order
         Test.startTest();
-        List<OrderItem> orderItems = OrderProductsController.addOrderItem(order.Id,product.Id,pricebookEntry.Id);
+        List<OrderItemDTO> orderItemDTOS = OrderProductsController.addOrderItem(order.Id,product.Id,pricebookEntry.Id);
         Test.stopTest();
         //expected Quantity of the orderItem will be increased
-        System.assertEquals(1,orderItems.size(),'OrderItem size should be 1');
-        System.assertEquals(2,orderItems.get(0).Quantity,'OrderItem Quantity should be 2');
+        System.assertEquals(1,orderItemDTOS.size(),'OrderItem size should be 1');
+        System.assertEquals(2,orderItemDTOS.get(0).quantity,'OrderItem Quantity should be 2');
 
     }
     @IsTest
@@ -57,11 +57,11 @@ public with sharing class OrderProductsControllerTest {
 
         //when Product is not present in listed OrderItems
         Test.startTest();
-        List<OrderItem> orderItems = OrderProductsController.addOrderItem(order.Id,product.Id,pricebookEntry.Id);
+        List<OrderItemDTO> orderItemDTOS  = OrderProductsController.addOrderItem(order.Id,product.Id,pricebookEntry.Id);
         Test.stopTest();
 
         //expected new order Item will be inserted
-        System.assertEquals(2,orderItems.size(),'OrderItem size should be 2');
+        System.assertEquals(2,orderItemDTOS.size(),'OrderItem size should be 2');
 
     }
 
