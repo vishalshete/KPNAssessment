@@ -2,7 +2,7 @@
  * Created by vishalshete on 08/07/2021.
  */
 
-public with sharing class OrderDTO {
+public inherited sharing class OrderDTO {
 
     public String accountNumber;
     public String orderNumber;

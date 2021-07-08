@@ -2,7 +2,7 @@
  * Created by vishalshete on 07/07/2021.
  */
 
-public with sharing class PostOrders {
+public inherited sharing class PostOrders {
     private static final String  requestEndPoint = 'https://kpn-order-assessment.requestcatcher.com/test';
 
     /**

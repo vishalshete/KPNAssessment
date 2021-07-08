@@ -3,7 +3,7 @@
  * DTO to convert Order Item record to be used  in datatable
  */
 
-public with sharing class OrderItemDTO {
+public inherited sharing class OrderItemDTO {
     @AuraEnabled
     public String product2Id;
     @AuraEnabled
