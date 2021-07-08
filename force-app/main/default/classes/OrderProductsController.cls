@@ -51,7 +51,7 @@ public inherited sharing class OrderProductsController {
             orderRecordId = orderId;
             return convertOrderItemDTO(orderItems);
         } catch (Exception ex){
-            throw ex;
+            throw new CustomException(ex.getMessage());
         }
     }
     /**
@@ -65,7 +65,7 @@ public inherited sharing class OrderProductsController {
             Order order = [SELECT Id, Status,Account.AccountNumber,OrderNumber,Type,Pricebook2Id FROM Order WHERE Id = :orderId WITH SECURITY_ENFORCED];
             return order;
         } catch (Exception ex){
-            throw ex;
+            throw new CustomException(ex.getMessage());
         }
     }
 
@@ -135,7 +135,7 @@ public inherited sharing class OrderProductsController {
             }
             return order;
         } catch (Exception ex){
-            throw ex;
+            throw new CustomException(ex.getMessage());
         }
     }
 
